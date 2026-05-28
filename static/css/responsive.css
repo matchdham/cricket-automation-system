@@ -1,0 +1,587 @@
+/* ============================================
+FILE: responsive.css
+PURPOSE: Responsive design breakpoints
+Mobile, Tablet, Desktop optimization
+============================================ */
+
+/* ============================================
+MOBILE FIRST - BASE STYLES (< 480px)
+============================================ */
+
+/* Small phones */
+@media (max-width: 479px) {
+    body {
+        font-size: 12px;
+    }
+
+    .header {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .header-title {
+        font-size: 14px;
+    }
+
+    .header-user {
+        font-size: 10px;
+    }
+
+    .tabs-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-button {
+        min-width: 55px;
+        padding: 8px 3px;
+        font-size: 9px;
+    }
+
+    .tab-content {
+        padding: 10px;
+    }
+
+    h1 { font-size: 20px; }
+    h2 { font-size: 16px; }
+    h3 { font-size: 14px; }
+
+    button {
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+
+    input, textarea, select {
+        padding: 9px 10px;
+        font-size: 14px; /* Prevent iOS zoom */
+    }
+
+    label {
+        font-size: 11px;
+        margin-bottom: 4px;
+    }
+
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .player-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .player-card {
+        padding: 8px;
+    }
+
+    .player-image {
+        width: 45px;
+        height: 45px;
+    }
+
+    .player-name {
+        font-size: 10px;
+    }
+
+    .counter-box {
+        padding: 10px;
+    }
+
+    .counter-label {
+        font-size: 10px;
+    }
+
+    .counter-value {
+        font-size: 20px;
+    }
+
+    .message {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .badge {
+        font-size: 9px;
+        padding: 3px 6px;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .button-group button {
+        width: 100%;
+    }
+}
+
+/* ============================================
+MEDIUM PHONES (480px - 599px)
+============================================ */
+
+@media (min-width: 480px) and (max-width: 599px) {
+    body {
+        font-size: 13px;
+    }
+
+    .header {
+        padding: 12px 16px;
+    }
+
+    .header-title {
+        font-size: 16px;
+    }
+
+    .tab-button {
+        min-width: 70px;
+        padding: 10px 5px;
+        font-size: 11px;
+    }
+
+    .tab-content {
+        padding: 14px;
+    }
+
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 16px; }
+
+    button {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    input, textarea, select {
+        padding: 10px 11px;
+        font-size: 14px;
+    }
+
+    .player-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .player-image {
+        width: 50px;
+        height: 50px;
+    }
+
+    .counter-value {
+        font-size: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+}
+
+/* ============================================
+LARGE PHONES / SMALL TABLETS (600px - 767px)
+============================================ */
+
+@media (min-width: 600px) and (max-width: 767px) {
+    body {
+        font-size: 14px;
+    }
+
+    .header {
+        padding: 14px 18px;
+    }
+
+    .header-title {
+        font-size: 18px;
+    }
+
+    .tab-button {
+        min-width: 90px;
+        padding: 12px 8px;
+        font-size: 12px;
+    }
+
+    .tab-content {
+        padding: 16px;
+    }
+
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    h3 { font-size: 18px; }
+
+    button {
+        padding: 11px 16px;
+        font-size: 14px;
+    }
+
+    .player-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .player-image {
+        width: 60px;
+        height: 60px;
+    }
+
+    .counter-value {
+        font-size: 26px;
+    }
+
+    .button-group {
+        flex-direction: row;
+    }
+
+    .button-group button {
+        flex: 1;
+    }
+}
+
+/* ============================================
+TABLETS (768px - 1023px)
+============================================ */
+
+@media (min-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .header {
+        padding: 15px 24px;
+    }
+
+    .header-title {
+        font-size: 20px;
+    }
+
+    .tab-button {
+        min-width: 100px;
+        padding: 14px 12px;
+        font-size: 13px;
+    }
+
+    .tab-content {
+        padding: 24px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    h1 { font-size: 28px; }
+    h2 { font-size: 22px; }
+    h3 { font-size: 18px; }
+
+    button {
+        padding: 12px 18px;
+        font-size: 14px;
+    }
+
+    input, textarea, select {
+        padding: 12px 13px;
+        font-size: 14px;
+    }
+
+    .player-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
+
+    .player-image {
+        width: 70px;
+        height: 70px;
+    }
+
+    .counter-box {
+        padding: 18px;
+    }
+
+    .counter-value {
+        font-size: 32px;
+    }
+
+    /* Tablet specific layout */
+    .form-group {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        margin-bottom: 0;
+        text-align: right;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        grid-column: 2;
+    }
+
+    .button-group {
+        gap: 12px;
+    }
+}
+
+/* ============================================
+DESKTOP (1024px - 1439px)
+============================================ */
+
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .tab-content {
+        padding: 30px 40px;
+    }
+
+    h1 { font-size: 32px; }
+    h2 { font-size: 26px; }
+    h3 { font-size: 20px; }
+
+    button {
+        padding: 13px 20px;
+        font-size: 15px;
+    }
+
+    .player-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .player-image {
+        width: 80px;
+        height: 80px;
+    }
+
+    /* Desktop specific grid layout */
+    .tab1-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    .tab2-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+
+    /* Hover effects on desktop */
+    button:hover {
+        transform: translateY(-3px);
+    }
+
+    .counter-box:hover {
+        transform: translateY(-4px);
+    }
+}
+
+/* ============================================
+LARGE DESKTOP (1440px+)
+============================================ */
+
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .tab-content {
+        padding: 40px 60px;
+    }
+
+    h1 { font-size: 36px; }
+    h2 { font-size: 28px; }
+    h3 { font-size: 22px; }
+
+    button {
+        padding: 14px 24px;
+        font-size: 16px;
+    }
+
+    .player-grid {
+        grid-template-columns: repeat(8, 1fr);
+    }
+
+    .player-image {
+        width: 90px;
+        height: 90px;
+    }
+
+    .counter-value {
+        font-size: 40px;
+    }
+}
+
+/* ============================================
+LANDSCAPE MODE
+============================================ */
+
+@media (orientation: landscape) {
+    .header {
+        padding: 10px 16px;
+    }
+
+    .header-title {
+        font-size: 16px;
+    }
+
+    .tab-button {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    .tab-content {
+        padding: 12px 16px;
+        min-height: auto;
+    }
+
+    /* Landscape specific adjustments */
+    button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+/* ============================================
+PORTRAIT MODE
+============================================ */
+
+@media (orientation: portrait) {
+    .tab-content {
+        min-height: calc(100vh - 150px);
+    }
+
+    /* Full height tabs in portrait */
+    .player-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ============================================
+TOUCH DEVICE OPTIMIZATION
+============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets */
+    button {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .tab-button {
+        min-height: 44px;
+    }
+
+    input, textarea, select {
+        min-height: 44px;
+    }
+
+    /* Remove hover effects on touch */
+    button:hover {
+        transform: none;
+    }
+
+    .counter-box:hover {
+        transform: none;
+    }
+
+    /* Touch-friendly spacing */
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .player-grid {
+        gap: 12px;
+    }
+}
+
+/* ============================================
+HIGH RESOLUTION DISPLAYS (Retina)
+============================================ */
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .tab-button {
+        border-bottom-width: 2px;
+    }
+
+    .counter-box {
+        border-left-width: 3px;
+    }
+
+    .post-item {
+        border-left-width: 3px;
+    }
+}
+
+/* ============================================
+REDUCED MOTION SUPPORT
+============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================
+PRINT STYLES
+============================================ */
+
+@media print {
+    .header,
+    .tabs-container,
+    button,
+    .logout-btn {
+        display: none;
+    }
+
+    body {
+        background: white;
+        color: black;
+    }
+
+    .tab-content {
+        display: block !important;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    input, textarea {
+        border: 1px solid #000;
+    }
+
+    a {
+        text-decoration: underline;
+    }
+}
+
+/* ============================================
+ACCESSIBILITY FOCUS STYLES
+============================================ */
+
+*:focus-visible {
+    outline: 2px solid #1e5ba8;
+    outline-offset: 2px;
+}
+
+button:focus-visible {
+    outline-offset: 4px;
+}
+
+/* ============================================
+SAFE AREA SUPPORT (iPhone X+)
+============================================ */
+
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+    }
+
+    .header {
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+    }
+}

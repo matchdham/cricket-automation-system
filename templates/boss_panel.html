@@ -1,0 +1,362 @@
+<!-- ============================================
+FILE: boss_panel.html
+PURPOSE: Boss (Super Admin) control panel
+Admin/Worker management + Audit logs
+============================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boss Panel - Cricket Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e5ba8 0%, #ff6b35 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            color: #1e5ba8;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1e5ba8;
+            box-shadow: 0 0 0 3px rgba(30, 91, 168, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #1e5ba8 0%, #ff6b35 100%);
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #1e5ba8 0%, #ff6b35 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .user-item {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 4px solid #1e5ba8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            font-size: 11px;
+            background: #e74c3c;
+        }
+
+        .action-btn:hover {
+            background: #c0392b;
+        }
+
+        .log-item {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .log-time {
+            color: #999;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .log-action {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .message.success {
+            background: #eafce4;
+            color: #2ecc71;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .message.error {
+            background: #ffebee;
+            color: #e74c3c;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            padding: 10px 15px;
+            background: white;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #666;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .tab-btn.active {
+            color: #1e5ba8;
+            border-bottom-color: #1e5ba8;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                padding: 15px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">👑 Boss Panel</div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Dashboard Stats -->
+        <div class="section">
+            <h2>📊 Dashboard Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Total Admins</div>
+                    <div class="stat-value" id="adminCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Workers</div>
+                    <div class="stat-value" id="workerCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Posts</div>
+                    <div class="stat-value" id="totalPosts">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Posted</div>
+                    <div class="stat-value" id="totalPosted">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Admin -->
+        <div class="section">
+            <h2>➕ Create Admin</h2>
+            
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="newAdminUsername" placeholder="admin_name">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="newAdminPassword" placeholder="Strong password">
+            </div>
+
+            <button onclick="createAdmin()">Create Admin</button>
+            <div id="createMessage" style="margin-top: 10px;"></div>
+        </div>
+
+        <!-- User Management -->
+        <div class="section">
+            <h2>👥 User Management</h2>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('admins')">Admins</button>
+                <button class="tab-btn" onclick="switchTab('workers')">Workers</button>
+            </div>
+
+            <!-- Admins Tab -->
+            <div id="admins" class="tab-content active">
+                <div id="adminsList"></div>
+            </div>
+
+            <!-- Workers Tab -->
+            <div id="workers" class="tab-content">
+                <div id="workersList"></div>
+            </div>
+        </div>
+
+        <!-- Audit Logs -->
+        <div class="section">
+            <h2>📋 Audit Logs</h2>
+            <div id="auditLogsList"></div>
+        </div>
+    </div>
+
+    <script src="/static/js/boss_panel.js"></script>
+</body>
+</html>

@@ -1,0 +1,787 @@
+/* ============================================
+FILE: dashboard.css
+PURPOSE: Dashboard styling (Mobile-first)
+All 4 tabs, responsive, animations
+============================================ */
+
+/* ============================================
+RESET & BASE STYLES
+============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+/* ============================================
+TYPOGRAPHY
+============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+h1 { font-size: 28px; }
+h2 { font-size: 22px; }
+h3 { font-size: 18px; }
+h4 { font-size: 15px; }
+h5 { font-size: 13px; }
+
+p {
+    margin-bottom: 10px;
+}
+
+a {
+    color: #1e5ba8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================
+HEADER STYLES
+============================================ */
+
+.header {
+    background: linear-gradient(135deg, #1e5ba8 0%, #ff6b35 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-user {
+    font-size: 11px;
+    opacity: 0.85;
+    margin-top: 4px;
+}
+
+.logout-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+TABS CONTAINER
+============================================ */
+
+.tabs-container {
+    background: white;
+    display: flex;
+    gap: 0;
+    padding: 0;
+    border-bottom: 2px solid #e0e0e0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    position: sticky;
+    top: 60px;
+    z-index: 999;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tabs-container::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-button {
+    flex: 1;
+    min-width: 80px;
+    padding: 12px 8px;
+    border: none;
+    background: white;
+    color: #666;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.tab-button:active {
+    background: #f9f9f9;
+}
+
+.tab-button.active {
+    color: #1e5ba8;
+    border-bottom-color: #1e5ba8;
+    background: #f9f9f9;
+}
+
+/* ============================================
+TAB CONTENT
+============================================ */
+
+.tab-content {
+    display: none;
+    padding: 20px;
+    animation: fadeInUp 0.3s ease-out;
+    min-height: calc(100vh - 150px);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+FORM STYLES
+============================================ */
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+label {
+    display: block;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="file"],
+textarea,
+select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fafafa;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="file"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #1e5ba8;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(30, 91, 168, 0.08);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+input[type="file"] {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+/* ============================================
+BUTTON STYLES
+============================================ */
+
+button {
+    background: linear-gradient(135deg, #1e5ba8 0%, #ff6b35 100%);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    width: auto;
+    display: inline-block;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(30, 91, 168, 0.25);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.button-group button {
+    flex: 1;
+}
+
+/* ============================================
+MESSAGE STYLES
+============================================ */
+
+.message {
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    border-left: 4px solid;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.message.success {
+    background: #eafce4;
+    color: #2ecc71;
+    border-color: #2ecc71;
+}
+
+.message.error {
+    background: #ffebee;
+    color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+.message.info {
+    background: #e3f2fd;
+    color: #3498db;
+    border-color: #3498db;
+}
+
+.message.warning {
+    background: #fff3e0;
+    color: #f39c12;
+    border-color: #f39c12;
+}
+
+/* ============================================
+COUNTER BOX STYLES
+============================================ */
+
+.counter-box {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #1e5ba8;
+    transition: all 0.3s ease;
+}
+
+.counter-box:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.counter-label {
+    color: #999;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.counter-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e5ba8;
+}
+
+/* ============================================
+HEALTH STATUS STYLES
+============================================ */
+
+.health-status {
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.health-status.online {
+    background: #eafce4;
+    color: #2ecc71;
+}
+
+.health-status.offline {
+    background: #ffebee;
+    color: #e74c3c;
+}
+
+.health-status.error {
+    background: #fff3e0;
+    color: #f39c12;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ============================================
+POST ITEM STYLES
+============================================ */
+
+.post-item {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border-left: 4px solid #ff6b35;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.post-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.post-status {
+    font-size: 11px;
+    color: #999;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.posted {
+    background: #2ecc71;
+    color: white;
+}
+
+.badge.pending {
+    background: #f39c12;
+    color: white;
+}
+
+/* ============================================
+TOGGLE SWITCH STYLES
+============================================ */
+
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.switch {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    background: #ddd;
+    border-radius: 13px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    flex-shrink: 0;
+}
+
+.switch.active {
+    background: #2ecc71;
+}
+
+.switch-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    transition: left 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.switch.active .switch-slider {
+    left: 24px;
+}
+
+/* ============================================
+PLAYER GRID STYLES
+============================================ */
+
+.player-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.player-card {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.player-card:hover {
+    border-color: #1e5ba8;
+    box-shadow: 0 4px 12px rgba(30, 91, 168, 0.15);
+    transform: translateY(-2px);
+}
+
+.player-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    margin: 0 auto 8px;
+    object-fit: cover;
+    border: 2px solid #e0e0e0;
+}
+
+.player-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 12px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    padding: 6px 8px;
+    font-size: 11px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+
+/* ============================================
+LOADING SPINNER
+============================================ */
+
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #1e5ba8;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ============================================
+RESPONSIVE DESIGN
+============================================ */
+
+@media (max-width: 600px) {
+    body {
+        font-size: 13px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 12px 16px;
+    }
+
+    .header-title {
+        font-size: 16px;
+    }
+
+    .tab-button {
+        min-width: 70px;
+        padding: 10px 6px;
+        font-size: 11px;
+    }
+
+    .tab-content {
+        padding: 16px;
+    }
+
+    button {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .button-group button {
+        width: 100%;
+    }
+
+    .player-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .player-card {
+        padding: 8px;
+    }
+
+    .player-image {
+        width: 50px;
+        height: 50px;
+    }
+
+    .player-name {
+        font-size: 11px;
+    }
+
+    .counter-value {
+        font-size: 24px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    textarea {
+        padding: 10px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    label {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 10px 12px;
+    }
+
+    .header-title {
+        font-size: 14px;
+    }
+
+    .logout-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+
+    .tab-button {
+        min-width: 60px;
+        padding: 8px 4px;
+        font-size: 10px;
+    }
+
+    .tab-content {
+        padding: 12px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .counter-box {
+        padding: 12px;
+    }
+
+    .counter-label {
+        font-size: 11px;
+    }
+
+    .counter-value {
+        font-size: 22px;
+    }
+
+    .player-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ============================================
+LANDSCAPE MODE
+============================================ */
+
+@media (orientation: landscape) {
+    .tab-content {
+        min-height: auto;
+    }
+
+    .header {
+        padding: 10px 20px;
+    }
+
+    .tab-button {
+        padding: 10px 12px;
+    }
+}
+
+/* ============================================
+DARK MODE SUPPORT (Optional)
+============================================ */
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #1a1a1a;
+        color: #f0f0f0;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #0d3a5c 0%, #d94319 100%);
+    }
+
+    .tabs-container {
+        background: #2a2a2a;
+        border-bottom-color: #3a3a3a;
+    }
+
+    .tab-button {
+        color: #aaa;
+        background: #2a2a2a;
+    }
+
+    .tab-button.active {
+        color: #64b5f6;
+    }
+
+    input, textarea, select {
+        background: #3a3a3a;
+        border-color: #4a4a4a;
+        color: #f0f0f0;
+    }
+
+    .counter-box {
+        background: #2a2a2a;
+        color: #f0f0f0;
+    }
+
+    .post-item {
+        background: #2a2a2a;
+    }
+
+    .player-card {
+        background: #2a2a2a;
+        border-color: #3a3a3a;
+    }
+}
+
+/* ============================================
+PRINT STYLES
+============================================ */
+
+@media print {
+    .header, .tabs-container, button {
+        display: none;
+    }
+
+    body {
+        background: white;
+    }
+
+    .tab-content {
+        display: block !important;
+    }
+}

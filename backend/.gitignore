@@ -1,0 +1,229 @@
+# ============================================
+# GIT IGNORE FILE
+# GitHub पर push मत करो ये सब!
+# ============================================
+
+# ============================================
+# ENVIRONMENT & SECRETS
+# ============================================
+
+.env
+.env.local
+.env.*.local
+.env.prod
+.env.production
+
+# ============================================
+# PYTHON
+# ============================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ============================================
+# VIRTUAL ENVIRONMENT
+# ============================================
+
+venv/
+ENV/
+env/
+.venv
+env.bak/
+venv.bak/
+
+# ============================================
+# IDE & EDITOR
+# ============================================
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# DATABASE
+# ============================================
+
+*.db
+*.sqlite
+*.sqlite3
+database/cricket.db
+backups/
+
+# ============================================
+# LOGS
+# ============================================
+
+logs/
+*.log
+*.log.*
+
+# ============================================
+# UPLOADS (Local only - don't push)
+# ============================================
+
+uploads/players/*
+uploads/backgrounds/*
+uploads/sponsors/*
+uploads/generated/auto_posts/*
+uploads/generated/manual_posts/*
+uploads/generated/wicket_posts/*
+
+# But keep these placeholder files
+!uploads/.gitkeep
+!uploads/players/.gitkeep
+!uploads/backgrounds/.gitkeep
+!uploads/sponsors/.gitkeep
+!uploads/generated/.gitkeep
+!uploads/generated/auto_posts/.gitkeep
+!uploads/generated/manual_posts/.gitkeep
+!uploads/generated/wicket_posts/.gitkeep
+
+# ============================================
+# NODE MODULES (अगर frontend tools use करो)
+# ============================================
+
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm/
+
+# ============================================
+# TESTING
+# ============================================
+
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# ============================================
+# CACHE
+# ============================================
+
+.cache/
+*.cache
+temp/
+tmp/
+*.tmp
+.DS_Store
+
+# ============================================
+# COMPILED FILES
+# ============================================
+
+*.pyc
+*.pyo
+*.class
+
+# ============================================
+# OS SPECIFIC
+# ============================================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.env.local.php
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# ============================================
+# RENDER SPECIFIC
+# ============================================
+
+# Render में .env की जरूरत नहीं
+# Environment variables Render dashboard से set करो
+
+# ============================================
+# PROJECT SPECIFIC
+# ============================================
+
+# Credentials
+credentials.json
+secrets.json
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Compiled static files
+staticfiles/
+*.min.js
+*.min.css
+
+# Media files (अगर बड़ी हों)
+*.mp4
+*.mov
+*.avi
+
+# ============================================
+# IDE CONFIGURATIONS (अलग-अलग editors के लिए)
+# ============================================
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# PyCharm
+.idea/*
+*.iml
+*.iws
+*.ipr
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================
+# MISCELLANEOUS
+# ============================================
+
+.venv/
+venv/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytest_cache
+.hypothesis/
