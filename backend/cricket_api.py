@@ -1,217 +1,146 @@
-# ============================================
-# FILE: cricket_api.py
-# PURPOSE: CricAPI integration - Live data fetch
-# ============================================
+import os
+from datetime import timedelta
 
-import requests
-from config import config
-from database import log_error
+# Get base directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
 
-CRICAPI_KEY = config.CRICAPI_KEY
-BASE_URL = config.CRICAPI_BASE_URL
+# Database path - use /tmp for Vercel (read-write filesystem)
+if os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production':
+    # Vercel environment - use /tmp
+    DATABASE_PATH = '/tmp/cricket.db'
+    LOG_FILE = '/tmp/app.log'
+    BACKUP_PATH = '/tmp/backups'
+    UPLOAD_FOLDER = '/tmp/uploads'
+else:
+    # Local development
+    DATABASE_PATH = os.path.join(PROJECT_ROOT, 'database', 'cricket.db')
+    LOG_FILE = os.path.join(PROJECT_ROOT, 'logs', 'app.log')
+    BACKUP_PATH = os.path.join(PROJECT_ROOT, 'backups')
+    UPLOAD_FOLDER = os.path.join(PROJECT_ROOT, 'uploads')
 
-def get_current_matches():
-    """
-    CricAPI से सभी live + upcoming matches fetch करो
-    
-    RETURN:
-        list: [{match_id, name, status, score, ...}, ...]
-    """
+# Create directories only in development (not in production)
+if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production'):
     try:
-        url = f"{BASE_URL}/currentMatches"
-        params = {"apikey": CRICAPI_KEY}
-        
-        response = requests.get(url, params=params, timeout=10)
-        
-        if response.status_code != 200:
-            log_error("cricapi_error", f"currentMatches failed: {response.status_code}")
-            return []
-        
-        data = response.json()
-        matches = data.get("data", [])
-        
-        log_error('success', f'Fetched {len(matches)} matches')
-        
-        return matches
-        
-    except requests.exceptions.RequestException as e:
-        log_error('cricapi_error', 'currentMatches failed', str(e))
-        return []
+        os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
+        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+        os.makedirs(BACKUP_PATH, exist_ok=True)
     except Exception as e:
-        log_error('api_error', 'currentMatches error', str(e))
-        return []
+        print(f"Warning: Could not create directories: {e}")
 
-def get_match_info(match_id):
-    """
-    एक match का detailed info fetch करो
-    (Over, runs, wickets, fall_of_wickets, etc)
-    
-    PARAMS:
-        match_id: Match का unique ID
-    
-    RETURN:
-        dict: {over, runs, wickets, scorecard, ...}
-    """
-    try:
-        url = f"{BASE_URL}/match_info"
-        params = {
-            "apikey": CRICAPI_KEY,
-            "id": match_id
-        }
-        
-        response = requests.get(url, params=params, timeout=10)
-        
-        if response.status_code != 200:
-            log_error("cricapi_error", f"match_info failed: {response.status_code}")
-            return None
-        
-        data = response.json()
-        match_data = data.get("data", {})
-        
-        log_error('success', f'Fetched match info: {match_id}')
-        
-        return match_data
-        
-    except requests.exceptions.RequestException as e:
-        log_error('cricapi_error', 'match_info failed', str(e))
-        return None
-    except Exception as e:
-        log_error('api_error', 'match_info error', str(e))
-        return None
+# Upload folder paths
+PLAYER_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'players')
+BACKGROUND_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'backgrounds')
+SPONSOR_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'sponsors')
+GENERATED_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'manual_posts')
+AUTO_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'auto_posts')
+WICKET_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'wicket_posts')
 
-def get_series(search_term=None):
-    """
-    Cricket series list fetch करो (IPL, T20, etc)
-    
-    PARAMS:
-        search_term: Optional - "IPL" search करने के लिए
-    
-    RETURN:
-        list: [{series_id, name, status}, ...]
-    """
-    try:
-        url = f"{BASE_URL}/series"
-        params = {"apikey": CRICAPI_KEY}
-        
-        if search_term:
-            params["search"] = search_term
-        
-        response = requests.get(url, params=params, timeout=10)
-        
-        if response.status_code != 200:
-            return []
-        
-        data = response.json()
-        series = data.get("data", [])
-        
-        return series
-        
-    except Exception as e:
-        log_error('api_error', 'series fetch error', str(e))
-        return []
+# Create upload directories (these should exist in production)
+if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production'):
+    for folder in [PLAYER_UPLOAD_FOLDER, BACKGROUND_UPLOAD_FOLDER, SPONSOR_UPLOAD_FOLDER, 
+                   GENERATED_POSTS_FOLDER, AUTO_POSTS_FOLDER, WICKET_POSTS_FOLDER]:
+        try:
+            os.makedirs(folder, exist_ok=True)
+        except Exception as e:
+            print(f"Warning: Could not create folder {folder}: {e}")
 
-def get_players(search_term=None):
-    """
-    Players list fetch करो (Autocomplete के लिए)
+class Config:
+    """Base configuration"""
+    # Flask settings
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+    TESTING = False
+    HOST = '0.0.0.0'
+    PORT = int(os.environ.get('PORT', 5000))
     
-    PARAMS:
-        search_term: Optional - Player name search करने के लिए
+    # Session settings
+    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
     
-    RETURN:
-        list: [{player_id, name, country}, ...]
-    """
-    try:
-        url = f"{BASE_URL}/players"
-        params = {"apikey": CRICAPI_KEY}
-        
-        if search_term:
-            params["search"] = search_term
-        
-        response = requests.get(url, params=params, timeout=10)
-        
-        if response.status_code != 200:
-            return []
-        
-        data = response.json()
-        players = data.get("data", [])
-        
-        return players
-        
-    except Exception as e:
-        log_error('api_error', 'players fetch error', str(e))
-        return []
+    # JWT settings
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
+    JWT_ALGORITHM = 'HS256'
+    
+    # Database
+    SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # Upload settings
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'ttf'}
+    
+    # API keys and URLs
+    CRICAPI_KEY = os.environ.get('CRICAPI_KEY', '')
+    CRICAPI_BASE_URL = 'https://api.cricapi.com/v1'
+    
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+    GEMINI_MODEL = 'gemini-pro'
+    
+    FACEBOOK_TOKEN = os.environ.get('FACEBOOK_TOKEN', '')
+    FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '')
+    FACEBOOK_API_VERSION = 'v18.0'
+    
+    # Paths
+    DATABASE_PATH = DATABASE_PATH
+    LOG_FILE = LOG_FILE
+    BACKUP_PATH = BACKUP_PATH
+    UPLOAD_FOLDER = UPLOAD_FOLDER
+    PLAYER_UPLOAD_FOLDER = PLAYER_UPLOAD_FOLDER
+    BACKGROUND_UPLOAD_FOLDER = BACKGROUND_UPLOAD_FOLDER
+    SPONSOR_UPLOAD_FOLDER = SPONSOR_UPLOAD_FOLDER
+    GENERATED_POSTS_FOLDER = GENERATED_POSTS_FOLDER
+    AUTO_POSTS_FOLDER = AUTO_POSTS_FOLDER
+    WICKET_POSTS_FOLDER = WICKET_POSTS_FOLDER
+    
+    # Image Settings
+    IMAGE_WIDTH = 1080
+    IMAGE_HEIGHT = 1350
+    IMAGE_QUALITY = 85
+    PLAYER_IMAGE_SIZE = (400, 400)
+    SPONSOR_SIZE = (200, 50)
+    
+    # Scheduler
+    SCHEDULER_API_ENABLED = True
+    SCHEDULER_TIMEZONE = 'UTC'
+    SCORE_UPDATE_INTERVAL = 240  # 4 minutes
+    
+    # Facebook Queue
+    FACEBOOK_QUEUE_ENABLED = True
+    FACEBOOK_QUEUE_GAP_MINUTES = 1
+    
+    # Logging
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+    
+    # Environment
+    FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
+    IS_PRODUCTION = FLASK_ENV == 'production' or bool(os.environ.get('VERCEL'))
 
-def detect_wickets(previous_match_data, current_match_data):
-    """
-    पिछले match data और current data को compare करके
-    नए wickets detect करो
-    
-    PARAMS:
-        previous_match_data: पिछली call का data
-        current_match_data: इस call का data
-    
-    RETURN:
-        list: [नए wickets]
-    """
-    try:
-        new_wickets = []
-        
-        if not previous_match_data or not current_match_data:
-            return new_wickets
-        
-        prev_scorecard = previous_match_data.get('scorecard', {}).get('team_a', [])
-        curr_scorecard = current_match_data.get('scorecard', {}).get('team_a', [])
-        
-        for player in curr_scorecard:
-            player_name = player.get('name')
-            curr_wicket = player.get('wicket')
-            
-            # पिछली call में player को खोजो
-            prev_player = next((p for p in prev_scorecard if p.get('name') == player_name), None)
-            prev_wicket = prev_player.get('wicket') if prev_player else None
-            
-            # अगर पहले "not out" था और अब कोई wicket है, तो नया wicket है
-            if prev_wicket == "not out" and curr_wicket and curr_wicket != "not out":
-                new_wickets.append({
-                    'player': player_name,
-                    'wicket_info': curr_wicket,
-                    'runs': player.get('runs'),
-                    'balls': player.get('balls')
-                })
-        
-        return new_wickets
-        
-    except Exception as e:
-        log_error('api_error', 'wicket detection error', str(e))
-        return []
+class DevelopmentConfig(Config):
+    """Development configuration"""
+    DEBUG = True
+    TESTING = False
 
-def detect_milestone(previous_score, current_score, milestones=[50, 100]):
-    """
-    Milestone detect करो (50, 100 runs, etc)
-    
-    PARAMS:
-        previous_score: पिछला score
-        current_score: अब का score
-        milestones: List of milestone numbers
-    
-    RETURN:
-        list: [नए milestones]
-    """
-    try:
-        new_milestones = []
-        
-        if not previous_score or not current_score:
-            return new_milestones
-        
-        prev_runs = int(previous_score)
-        curr_runs = int(current_score)
-        
-        for milestone in milestones:
-            if prev_runs < milestone <= curr_runs:
-                new_milestones.append(milestone)
-        
-        return new_milestones
-        
-    except Exception as e:
-        log_error('api_error', 'milestone detection error', str(e))
-        return []
+class ProductionConfig(Config):
+    """Production configuration"""
+    DEBUG = False
+    TESTING = False
+    SESSION_COOKIE_SECURE = True
+
+class TestingConfig(Config):
+    """Testing configuration"""
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    WTF_CSRF_ENABLED = False
+
+# Select config based on environment
+config_name = os.environ.get('FLASK_ENV', 'development')
+if config_name == 'production':
+    config = ProductionConfig()
+elif config_name == 'testing':
+    config = TestingConfig()
+else:
+    config = DevelopmentConfig()
