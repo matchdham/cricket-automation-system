@@ -1,146 +1,261 @@
-import os
-from datetime import timedelta
+import requests
+from .config import config
 
-# Get base directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(BASE_DIR)
+BASE_URL = config.CRICAPI_BASE_URL
+API_KEY = config.CRICAPI_KEY
 
-# Database path - use /tmp for Vercel (read-write filesystem)
-if os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production':
-    # Vercel environment - use /tmp
-    DATABASE_PATH = '/tmp/cricket.db'
-    LOG_FILE = '/tmp/app.log'
-    BACKUP_PATH = '/tmp/backups'
-    UPLOAD_FOLDER = '/tmp/uploads'
-else:
-    # Local development
-    DATABASE_PATH = os.path.join(PROJECT_ROOT, 'database', 'cricket.db')
-    LOG_FILE = os.path.join(PROJECT_ROOT, 'logs', 'app.log')
-    BACKUP_PATH = os.path.join(PROJECT_ROOT, 'backups')
-    UPLOAD_FOLDER = os.path.join(PROJECT_ROOT, 'uploads')
+# ============================================
+# CURRENT & LIVE MATCHES
+# ============================================
 
-# Create directories only in development (not in production)
-if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production'):
+def get_current_matches():
+    """Get all current/live matches"""
     try:
-        os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        os.makedirs(BACKUP_PATH, exist_ok=True)
+        url = f"{BASE_URL}/currentMatches"
+        params = {
+            'apikey': API_KEY,
+            'offset': 0
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('data', []) if data.get('status') == 'ok' else []
     except Exception as e:
-        print(f"Warning: Could not create directories: {e}")
+        print(f"Error fetching current matches: {e}")
+        return []
 
-# Upload folder paths
-PLAYER_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'players')
-BACKGROUND_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'backgrounds')
-SPONSOR_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'sponsors')
-GENERATED_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'manual_posts')
-AUTO_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'auto_posts')
-WICKET_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'wicket_posts')
+def get_all_matches():
+    """Get all matches"""
+    try:
+        url = f"{BASE_URL}/matches"
+        params = {
+            'apikey': API_KEY,
+            'offset': 0
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('data', []) if data.get('status') == 'ok' else []
+    except Exception as e:
+        print(f"Error fetching all matches: {e}")
+        return []
 
-# Create upload directories (these should exist in production)
-if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production'):
-    for folder in [PLAYER_UPLOAD_FOLDER, BACKGROUND_UPLOAD_FOLDER, SPONSOR_UPLOAD_FOLDER, 
-                   GENERATED_POSTS_FOLDER, AUTO_POSTS_FOLDER, WICKET_POSTS_FOLDER]:
-        try:
-            os.makedirs(folder, exist_ok=True)
-        except Exception as e:
-            print(f"Warning: Could not create folder {folder}: {e}")
+# ============================================
+# MATCH INFO & DETAILS
+# ============================================
 
-class Config:
-    """Base configuration"""
-    # Flask settings
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-    DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
-    TESTING = False
-    HOST = '0.0.0.0'
-    PORT = int(os.environ.get('PORT', 5000))
-    
-    # Session settings
-    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
-    SESSION_COOKIE_SECURE = True
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
-    
-    # JWT settings
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
-    JWT_ALGORITHM = 'HS256'
-    
-    # Database
-    SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    # Upload settings
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'ttf'}
-    
-    # API keys and URLs
-    CRICAPI_KEY = os.environ.get('CRICAPI_KEY', '')
-    CRICAPI_BASE_URL = 'https://api.cricapi.com/v1'
-    
-    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-    GEMINI_MODEL = 'gemini-pro'
-    
-    FACEBOOK_TOKEN = os.environ.get('FACEBOOK_TOKEN', '')
-    FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '')
-    FACEBOOK_API_VERSION = 'v18.0'
-    
-    # Paths
-    DATABASE_PATH = DATABASE_PATH
-    LOG_FILE = LOG_FILE
-    BACKUP_PATH = BACKUP_PATH
-    UPLOAD_FOLDER = UPLOAD_FOLDER
-    PLAYER_UPLOAD_FOLDER = PLAYER_UPLOAD_FOLDER
-    BACKGROUND_UPLOAD_FOLDER = BACKGROUND_UPLOAD_FOLDER
-    SPONSOR_UPLOAD_FOLDER = SPONSOR_UPLOAD_FOLDER
-    GENERATED_POSTS_FOLDER = GENERATED_POSTS_FOLDER
-    AUTO_POSTS_FOLDER = AUTO_POSTS_FOLDER
-    WICKET_POSTS_FOLDER = WICKET_POSTS_FOLDER
-    
-    # Image Settings
-    IMAGE_WIDTH = 1080
-    IMAGE_HEIGHT = 1350
-    IMAGE_QUALITY = 85
-    PLAYER_IMAGE_SIZE = (400, 400)
-    SPONSOR_SIZE = (200, 50)
-    
-    # Scheduler
-    SCHEDULER_API_ENABLED = True
-    SCHEDULER_TIMEZONE = 'UTC'
-    SCORE_UPDATE_INTERVAL = 240  # 4 minutes
-    
-    # Facebook Queue
-    FACEBOOK_QUEUE_ENABLED = True
-    FACEBOOK_QUEUE_GAP_MINUTES = 1
-    
-    # Logging
-    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
-    
-    # Environment
-    FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
-    IS_PRODUCTION = FLASK_ENV == 'production' or bool(os.environ.get('VERCEL'))
+def get_match_info(match_id):
+    """Get detailed match information"""
+    try:
+        url = f"{BASE_URL}/match_info"
+        params = {
+            'apikey': API_KEY,
+            'id': match_id
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('data', {}) if data.get('status') == 'ok' else {}
+    except Exception as e:
+        print(f"Error fetching match info: {e}")
+        return {}
 
-class DevelopmentConfig(Config):
-    """Development configuration"""
-    DEBUG = True
-    TESTING = False
+# ============================================
+# COUNTRIES & SERIES
+# ============================================
 
-class ProductionConfig(Config):
-    """Production configuration"""
-    DEBUG = False
-    TESTING = False
-    SESSION_COOKIE_SECURE = True
+def get_countries():
+    """Get list of countries with flags"""
+    try:
+        url = f"{BASE_URL}/countries"
+        params = {
+            'apikey': API_KEY,
+            'offset': 0
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('data', []) if data.get('status') == 'ok' else []
+    except Exception as e:
+        print(f"Error fetching countries: {e}")
+        return []
 
-class TestingConfig(Config):
-    """Testing configuration"""
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    WTF_CSRF_ENABLED = False
+def get_series_list(offset=0):
+    """Get cricket series list"""
+    try:
+        url = f"{BASE_URL}/series"
+        params = {
+            'apikey': API_KEY,
+            'offset': offset
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('data', []) if data.get('status') == 'ok' else []
+    except Exception as e:
+        print(f"Error fetching series list: {e}")
+        return []
 
-# Select config based on environment
-config_name = os.environ.get('FLASK_ENV', 'development')
-if config_name == 'production':
-    config = ProductionConfig()
-elif config_name == 'testing':
-    config = TestingConfig()
-else:
-    config = DevelopmentConfig()
+def search_series(search_query):
+    """Search cricket series by name (e.g., 'IPL')"""
+    try:
+        url = f"{BASE_URL}/series"
+        params = {
+            'apikey': API_KEY,
+            'offset': 0,
+            'search': search_query
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('data', []) if data.get('status') == 'ok' else []
+    except Exception as e:
+        print(f"Error searching series: {e}")
+        return []
+
+def get_series_info(series_id):
+    """Get detailed series information"""
+    try:
+        url = f"{BASE_URL}/series_info"
+        params = {
+            'apikey': API_KEY,
+            'id': series_id
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('data', {}) if data.get('status') == 'ok' else {}
+    except Exception as e:
+        print(f"Error fetching series info: {e}")
+        return {}
+
+# ============================================
+# PLAYERS
+# ============================================
+
+def get_all_players(offset=0):
+    """Get all players list"""
+    try:
+        url = f"{BASE_URL}/players"
+        params = {
+            'apikey': API_KEY,
+            'offset': offset
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('data', []) if data.get('status') == 'ok' else []
+    except Exception as e:
+        print(f"Error fetching all players: {e}")
+        return []
+
+def search_players(player_name):
+    """Search players by name"""
+    try:
+        url = f"{BASE_URL}/players"
+        params = {
+            'apikey': API_KEY,
+            'offset': 0,
+            'search': player_name
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('data', []) if data.get('status') == 'ok' else []
+    except Exception as e:
+        print(f"Error searching players: {e}")
+        return []
+
+def get_player_info(player_id):
+    """Get detailed player information"""
+    try:
+        url = f"{BASE_URL}/players_info"
+        params = {
+            'apikey': API_KEY,
+            'id': player_id
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('data', {}) if data.get('status') == 'ok' else {}
+    except Exception as e:
+        print(f"Error fetching player info: {e}")
+        return {}
+
+# ============================================
+# HELPER FUNCTIONS
+# ============================================
+
+def get_live_score(match_id):
+    """Get live score for a match"""
+    match_data = get_match_info(match_id)
+    if match_data:
+        return {
+            'match_id': match_id,
+            'status': match_data.get('status', 'Unknown'),
+            'team1': match_data.get('teams', {}).get('team1', ''),
+            'team2': match_data.get('teams', {}).get('team2', ''),
+            'score': match_data.get('score', {}),
+            'description': match_data.get('description', ''),
+            'updated': match_data.get('updated', '')
+        }
+    return None
+
+def get_match_summary():
+    """Get summary of all current matches"""
+    matches = get_current_matches()
+    summary = {
+        'total_matches': len(matches),
+        'matches': []
+    }
+    
+    for match in matches:
+        summary['matches'].append({
+            'id': match.get('id'),
+            'name': match.get('name'),
+            'status': match.get('status'),
+            'teams': match.get('teams'),
+            'score': match.get('score')
+        })
+    
+    return summary
+
+def get_team_players(team_name):
+    """Search players from a specific team"""
+    all_players = get_all_players()
+    team_players = [p for p in all_players if team_name.lower() in p.get('name', '').lower()]
+    return team_players
+
+# ============================================
+# CRICKET DATA UTILITIES
+# ============================================
+
+def format_match_data(match):
+    """Format match data for display"""
+    return {
+        'id': match.get('id'),
+        'name': match.get('name'),
+        'status': match.get('status'),
+        'status_str': match.get('status_str'),
+        'team1': match.get('teams', {}).get('team1'),
+        'team2': match.get('teams', {}).get('team2'),
+        'score_team1': match.get('score', {}).get('team1'),
+        'score_team2': match.get('score', {}).get('team2'),
+        'description': match.get('description'),
+        'updated': match.get('updated')
+    }
+
+def format_player_data(player):
+    """Format player data for display"""
+    return {
+        'id': player.get('id'),
+        'name': player.get('name'),
+        'role': player.get('role'),
+        'country': player.get('country'),
+        'image': player.get('image')
+    }
+
+def get_match_updates():
+    """Get all match updates and live data"""
+    matches = get_current_matches()
+    return [format_match_data(m) for m in matches]
