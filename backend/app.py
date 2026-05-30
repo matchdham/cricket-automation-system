@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 import json
 
 # Import करो सभी modules
-from config import config
+from .config import config
 from auth import hash_password, verify_password, generate_jwt_token, verify_jwt_token
 from database import init_database, get_db_connection, log_error, fetch_one, fetch_all, execute_query
 from cricket_api import get_current_matches, get_match_info
