@@ -2,9 +2,19 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
+# Copy everything
 COPY . .
 
-CMD gunicorn backend.app:app --bind 0.0.0.0:${PORT:-8000}
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Set environment
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_APP=backend/app.py
+ENV FLASK_ENV=production
+
+# Expose port
+EXPOSE 8000
+
+# Run the app
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "60", "backend.app:app"]
