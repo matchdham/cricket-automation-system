@@ -2,19 +2,21 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy everything
+# Copy saari files main area mein
 COPY . .
 
-# Install dependencies
+# Dependencies install karo
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Set environment
+# SYSTEM PATH FIX: Yeh line Python ko poore project (root) se modules dhoondhne degi
+ENV PYTHONPATH=/app
+
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=backend/app.py
 ENV FLASK_ENV=production
 
-# Expose port
 EXPOSE 8000
 
-# Run the app
+# App ko root level se run karo taaki use config.py mil sake
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "60", "backend.app:app"]
+
