@@ -5,21 +5,16 @@ from datetime import timedelta
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
 
-# Database path - use /tmp for Vercel (read-write filesystem)
+# Database path
 if os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production':
-    # Vercel environment - use /tmp
     DATABASE_PATH = '/tmp/cricket.db'
     LOG_FILE = '/tmp/app.log'
     BACKUP_PATH = '/tmp/backups'
-    UPLOAD_FOLDER = '/tmp/uploads'
 else:
-    # Local development
     DATABASE_PATH = os.path.join(PROJECT_ROOT, 'database', 'cricket.db')
     LOG_FILE = os.path.join(PROJECT_ROOT, 'logs', 'app.log')
     BACKUP_PATH = os.path.join(PROJECT_ROOT, 'backups')
-    UPLOAD_FOLDER = os.path.join(PROJECT_ROOT, 'uploads')
 
-# Create directories only in development (not in production)
 if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production'):
     try:
         os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
@@ -28,7 +23,7 @@ if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production')
     except Exception as e:
         print(f"Warning: Could not create directories: {e}")
 
-# Upload folder paths
+UPLOAD_FOLDER = os.path.join(PROJECT_ROOT, 'uploads')
 PLAYER_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'players')
 BACKGROUND_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'backgrounds')
 SPONSOR_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'sponsors')
@@ -36,44 +31,35 @@ GENERATED_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'manual_posts'
 AUTO_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'auto_posts')
 WICKET_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'wicket_posts')
 
-# Create upload directories (these should exist in production)
-if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production'):
-    for folder in [PLAYER_UPLOAD_FOLDER, BACKGROUND_UPLOAD_FOLDER, SPONSOR_UPLOAD_FOLDER, 
-                   GENERATED_POSTS_FOLDER, AUTO_POSTS_FOLDER, WICKET_POSTS_FOLDER]:
-        try:
-            os.makedirs(folder, exist_ok=True)
-        except Exception as e:
-            print(f"Warning: Could not create folder {folder}: {e}")
+for folder in [PLAYER_UPLOAD_FOLDER, BACKGROUND_UPLOAD_FOLDER, SPONSOR_UPLOAD_FOLDER, 
+               GENERATED_POSTS_FOLDER, AUTO_POSTS_FOLDER, WICKET_POSTS_FOLDER]:
+    try:
+        os.makedirs(folder, exist_ok=True)
+    except Exception as e:
+        print(f"Warning: Could not create folder {folder}: {e}")
 
 class Config:
-    """Base configuration"""
-    # Flask settings
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
     DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
     TESTING = False
     HOST = '0.0.0.0'
     PORT = int(os.environ.get('PORT', 5000))
     
-    # Session settings
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     
-    # JWT settings
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
     JWT_ALGORITHM = 'HS256'
     
-    # Database
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # Upload settings
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'ttf'}
     
-    # API keys and URLs
     CRICAPI_KEY = os.environ.get('CRICAPI_KEY', '')
     CRICAPI_BASE_URL = 'https://api.cricapi.com/v1'
     
@@ -84,7 +70,6 @@ class Config:
     FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '')
     FACEBOOK_API_VERSION = 'v18.0'
     
-    # Paths
     DATABASE_PATH = DATABASE_PATH
     LOG_FILE = LOG_FILE
     BACKUP_PATH = BACKUP_PATH
@@ -96,47 +81,38 @@ class Config:
     AUTO_POSTS_FOLDER = AUTO_POSTS_FOLDER
     WICKET_POSTS_FOLDER = WICKET_POSTS_FOLDER
     
-    # Image Settings
     IMAGE_WIDTH = 1080
     IMAGE_HEIGHT = 1350
     IMAGE_QUALITY = 85
     PLAYER_IMAGE_SIZE = (400, 400)
     SPONSOR_SIZE = (200, 50)
     
-    # Scheduler
     SCHEDULER_API_ENABLED = True
     SCHEDULER_TIMEZONE = 'UTC'
-    SCORE_UPDATE_INTERVAL = 240  # 4 minutes
+    SCORE_UPDATE_INTERVAL = 240
     
-    # Facebook Queue
     FACEBOOK_QUEUE_ENABLED = True
     FACEBOOK_QUEUE_GAP_MINUTES = 1
     
-    # Logging
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     
-    # Environment
     FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
     IS_PRODUCTION = FLASK_ENV == 'production' or bool(os.environ.get('VERCEL'))
 
 class DevelopmentConfig(Config):
-    """Development configuration"""
     DEBUG = True
     TESTING = False
 
 class ProductionConfig(Config):
-    """Production configuration"""
     DEBUG = False
     TESTING = False
     SESSION_COOKIE_SECURE = True
 
 class TestingConfig(Config):
-    """Testing configuration"""
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False
 
-# Select config based on environment
 config_name = os.environ.get('FLASK_ENV', 'development')
 if config_name == 'production':
     config = ProductionConfig()
