@@ -4,7 +4,7 @@
 # ============================================
 
 import google.generativeai as genai
-from config import config
+from .config import config
 from database import log_error
 import re
 
