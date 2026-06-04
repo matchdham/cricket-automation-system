@@ -13,7 +13,8 @@ genai.configure(api_key=config.GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-pro')
 # Rate limiting counter
 rate_limit_counter = 0
-MAX_RATE_LIMIT = config.GEMINI_RATE_LIMIT
+MAX_RATE_LIMIT = 15
+
 
 def generate_caption_with_hashtags(news_title, ai_prompt=None):
     """
