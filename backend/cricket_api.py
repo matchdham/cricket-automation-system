@@ -1,8 +1,8 @@
 import requests
 from .config import config
 
-BASE_URL = config.CRICAPI_BASE_URL
-API_KEY = config.CRICAPI_KEY
+BASE_URL = "https://api.cricapi.com/v1"
+CRICAPI_KEY = "26d7de00-35e1-47a8-aea7-54b76903ba57"
 
 # ============================================
 # CURRENT & LIVE MATCHES
