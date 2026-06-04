@@ -10,8 +10,7 @@ import re
 
 # Gemini configure करो
 genai.configure(api_key=config.GEMINI_API_KEY)
-model = genai.GenerativeModel(config.GEMINI_MODEL)
-
+model = genai.GenerativeModel('gemini-pro')
 # Rate limiting counter
 rate_limit_counter = 0
 MAX_RATE_LIMIT = config.GEMINI_RATE_LIMIT
