@@ -7,7 +7,7 @@ import bcrypt
 import jwt
 import os
 from datetime import datetime, timedelta
-from config import config
+from. config import config
 
 def hash_password(password):
     """
