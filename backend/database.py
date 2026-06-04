@@ -6,7 +6,7 @@
 import sqlite3
 import os
 from datetime import datetime
-from config import config
+from. config import config
 
 DATABASE_PATH = config.DATABASE_PATH
 
