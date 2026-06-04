@@ -7,8 +7,8 @@
 from PIL import Image, ImageDraw, ImageFont
 import requests
 import os
-from config import config
-from database import log_error
+from .config import config
+from .database import log_error
 import io
 
 def get_background_from_pollinations(prompt):
