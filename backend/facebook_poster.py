@@ -5,8 +5,8 @@
 
 import requests
 import os
-from config import config
-from database import log_error, fetch_one, execute_query
+from .config import config
+from .database import log_error, fetch_one, execute_query
 
 FACEBOOK_TOKEN = config.FACEBOOK_TOKEN
 FACEBOOK_PAGE_ID = config.FACEBOOK_PAGE_ID
