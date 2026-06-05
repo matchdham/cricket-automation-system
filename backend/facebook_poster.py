@@ -7,10 +7,10 @@ import requests
 import os
 from .config import config
 from .database import log_error, fetch_one, execute_query
-
-FACEBOOK_TOKEN = config.FACEBOOK_TOKEN
-FACEBOOK_PAGE_ID = config.FACEBOOK_PAGE_ID
-FACEBOOK_API_VERSION = config.FACEBOOK_API_VERSION
+# Abhi ke liye empty chodh rahe hain taaki server crash na ho
+FACEBOOK_TOKEN = ""
+FACEBOOK_PAGE_ID = ""
+FACEBOOK_API_VERSION = "v18.0"
 
 def post_to_facebook(post_id, image_path, caption):
     """
