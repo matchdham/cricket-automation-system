@@ -140,12 +140,18 @@ def init_database():
         # Check if default admin exists
         cursor.execute('SELECT COUNT(*) FROM users WHERE role="admin"')
         if cursor.fetchone()[0] == 0:
-            from auth import hash_password
-            admin_hash = hash_password(config.DEFAULT_ADMIN_PASSWORD)
-            cursor.execute('''
-                INSERT INTO users (username, password_hash, role)
-                VALUES (?, ?, ?)
-            ''', (config.DEFAULT_ADMIN_USERNAME, admin_hash, 'admin'))
+                    from .auth import hash_password
+        
+        # Railway config se uthayega, agar nahi mila toh bina crash hue niche wala safe default le lega
+        admin_user = getattr(config, 'DEFAULT_ADMIN_USERNAME', 'admin')
+        raw_password = getattr(config, 'DEFAULT_ADMIN_PASSWORD', 'admin123')
+        
+        admin_hash = hash_password(raw_password)
+        cursor.execute('''
+            INSERT INTO users (username, password_hash, role)
+            VALUES (?, ?, ?)
+        ''', (admin_user, admin_hash, 'admin'))
+        
             conn.commit()
             print("✅ Default admin created! (admin/admin123)")
         
