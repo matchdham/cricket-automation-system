@@ -28,7 +28,7 @@ app = Flask(__name__,
 CORS(app)
 
 # Configuration
-app.config['MAX_CONTENT_LENGTH'] = config.MAX_FILE_SIZE
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = config.UPLOAD_BASE_FOLDER
 
 # Database initialize करो
