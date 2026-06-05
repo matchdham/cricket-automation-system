@@ -265,4 +265,4 @@ def backup_database():
     except Exception as e:
         print(f"❌ Backup error: {e}")
         return False
-        
+    
