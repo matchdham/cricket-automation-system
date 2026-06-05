@@ -49,7 +49,8 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
     DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
     TESTING = False
-    
+        BCRYPT_LOG_ROUNDS = 12
+
     # Session settings
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     SESSION_COOKIE_SECURE = True
