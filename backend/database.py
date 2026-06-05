@@ -6,10 +6,9 @@
 import sqlite3
 import os
 from datetime import datetime
-from. config import config
+from .config import config
 
-DATABASE_PATH = config.DATABASE_PATH
-
+DATABASE_PATH = 'database.db'
 def init_database():
     """
     Database को initialize करो
