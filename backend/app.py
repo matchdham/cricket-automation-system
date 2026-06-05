@@ -26,11 +26,9 @@ app = Flask(__name__,
             template_folder='../templates',
             static_folder='../static')
 CORS(app)
-
-# Configuration
+# Configurat
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-app.config['UPLOAD_FOLDER'] = config.UPLOAD_BASE_FOLDER
-
+app.config['UPLOAD_FOLDER'] = 'uploads'
 # Database initialize करो
 init_database()
 
