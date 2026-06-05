@@ -137,18 +137,17 @@ def init_database():
         
         conn.commit()
         
-            if cursor.fetchone()[0] == 0:
-        from .auth import hash_password
-        admin_user = getattr(config, 'DEFAULT_ADMIN_USERNAME', 'admin')
-        raw_password = getattr(config, 'DEFAULT_ADMIN_PASSWORD', 'admin123')
-        admin_hash = hash_password(raw_password)
-        cursor.execute('''
-            INSERT INTO users (username, password_hash, role)
-            VALUES (?, ?, ?)
-        ''', (admin_user, admin_hash, 'admin'))
-        conn.commit()
-        print("✅ Default admin created!")
-        
+    #Check if default admin exists        
+       cursor.execute('SELECT COUNT(*) FROM users WHERE role="admin")
+       if cursor.fetchone()[0] 0:
+           from .auth import hash password
+            admin hash = hash password(config.DEFAULT_ADMIN_PASSWORD)
+            cursor.execute("""
+              INSERT INTO users (username, password_hash, role)
+              VALUES (?, ?, 7)
+            """,(config.DEFAULT ADMIN USERNAME, admin hash, 'admin'))
+            conn.commit()
+            print(" Default admin created! (admin/admin123)")
         
         # Initialize lifecycle counter
         cursor.execute('SELECT COUNT(*) FROM lifecycle_counter')
