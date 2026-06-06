@@ -580,7 +580,27 @@ def api_health_status():
         return jsonify({'success': False, 'status': 'error'}), 500
 
 # ============================================
-# PAGES
-# ============================================
+# PAGES (Routings Fix)
+# ================================
+@app.route('/')
+def index():
+    """Login page load karo"""
+    return render_template('login.html')
 
-@
+@app.route('/dashboard')
+def dashboard():
+    """Main dashboard load karo"""
+    return render_template('dashboard.html')
+
+@app.route('/boss-panel')
+def boss_panel():
+    """Boss control panel load karo"""
+    return render_template('boss_panel.html')
+
+# ============================================
+# SERVER START
+# ============================================
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host='0.0.0.0', port=port)
+
