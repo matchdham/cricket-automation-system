@@ -26,9 +26,19 @@ app = Flask(__name__,
             template_folder='../templates',
             static_folder='../static')
 CORS(app)
-# Configurat
+
+# Configuration Set-up
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = 'uploads'
+
+# Runtime par ensure karo ki saare automation aur logo folders exist karte hon (Railway Fix)
+for folder in [config.PLAYERS_FOLDER, config.BACKGROUNDS_FOLDER, config.SPONSORS_FOLDER]:
+    if not os.path.exists(folder):
+        try:
+            os.makedirs(folder, exist_ok=True)
+        except Exception as e:
+            print(f"Warning: Could not create folder {folder}: {e}")
+
 # Database initialize करो
 init_database()
 
@@ -186,7 +196,7 @@ def api_create_post():
         
         final_caption = f"{caption}\n{hashtags}"
         
-        # Image generate करो
+        # Image generate करो (यहाँ auto logo apply हो रहा है)
         image_path = create_graphic_with_text(
             news_title=final_caption,
             background_image=background_image,
@@ -277,7 +287,7 @@ def api_edit_caption():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 # ============================================
-# TAB 2: DESIGN CONTROL
+# TAB 2: DESIGN CONTROL (यहाँ से लोगो अपलोड होगा)
 # ============================================
 
 @app.route('/api/upload-background', methods=['POST'])
@@ -573,21 +583,4 @@ def api_health_status():
 # PAGES
 # ============================================
 
-@app.route('/')
-def index():
-    """Login page"""
-    return render_template('login.html')
-
-@app.route('/dashboard')
-def dashboard():
-    """Main dashboard"""
-    return render_template('dashboard.html')
-
-@app.route('/boss-panel')
-def boss_panel():
-    """Boss control panel"""
-    return render_template('boss_panel.html')
-
-# ============================================
-# ERROR HANDLERS
-# ==========================================
+@
