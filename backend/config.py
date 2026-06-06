@@ -1,6 +1,6 @@
 # ============================================
 # FILE: config.py
-# PURPOSE: App Global Configuration & Environment Settings
+# PURPOSE: App Global Configuration & Environment Settings (Option B - Static Paths)
 # ============================================
 
 import os
@@ -30,8 +30,13 @@ if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production' 
     except Exception as e:
         print(f"Warning: Could not create directories: {e}")
 
-# Upload folder paths (Railway backend fixes)
-UPLOAD_FOLDER = os.path.join(PROJECT_ROOT, 'uploads')
+# ============================================
+# OPTION B: UPLOAD PATHS FIXED TO STATIC
+# ============================================
+STATIC_FOLDER = os.path.join(PROJECT_ROOT, 'static')
+UPLOAD_FOLDER = os.path.join(STATIC_FOLDER, 'uploads')
+
+# Ab saari images directly static/uploads ke andar jayengi taaki browser directly padh sake
 PLAYER_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'players')
 BACKGROUND_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'backgrounds')
 SPONSOR_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'sponsors')
@@ -56,22 +61,18 @@ for folder in [PLAYER_UPLOAD_FOLDER, BACKGROUND_UPLOAD_FOLDER, SPONSOR_UPLOAD_FO
 
 class Config:
     """Base configuration"""
-    # Flask settings
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production-32-chars-min')
     DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
     TESTING = False
     BCRYPT_LOG_ROUNDS = 12
 
-    # Session settings
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     
-    # ============================================
-    # JWT SETTINGS (यहाँ पर missing variables जोड़ दिए हैं!)
-    # ============================================
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
+    # JWT SETTINGS
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production-32-chars')
     JWT_ALGORITHM = 'HS256'
     JWT_EXPIRATION_HOURS = 24
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
@@ -84,7 +85,7 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
     
-    # Shorthand properties for backend imports
+    # Shorthand properties
     PLAYERS_FOLDER = PLAYERS_FOLDER
     BACKGROUNDS_FOLDER = BACKGROUNDS_FOLDER
     SPONSORS_FOLDER = SPONSORS_FOLDER
@@ -115,18 +116,15 @@ class Config:
     IS_PRODUCTION = FLASK_ENV == 'production' or bool(os.environ.get('VERCEL')) or bool(os.environ.get('RAILWAY_ENVIRONMENT'))
 
 class DevelopmentConfig(Config):
-    """Development configuration"""
     DEBUG = True
     TESTING = False
 
 class ProductionConfig(Config):
-    """Production configuration"""
     DEBUG = False
     TESTING = False
     SESSION_COOKIE_SECURE = True
 
 class TestingConfig(Config):
-    """Testing configuration"""
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False
@@ -139,5 +137,4 @@ elif config_name == 'testing':
     config = TestingConfig()
 else:
     config = DevelopmentConfig()
-    
     
