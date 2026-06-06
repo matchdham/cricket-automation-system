@@ -1,3 +1,8 @@
+# ============================================
+# FILE: config.py
+# PURPOSE: App Global Configuration & Environment Settings
+# ============================================
+
 import os
 from datetime import timedelta
 
@@ -5,9 +10,8 @@ from datetime import timedelta
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
 
-# Database path - use /tmp for Vercel (read-write filesystem)
-if os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production':
-    # Vercel environment - use /tmp
+# Database path - Railway/Vercel (Production check)
+if os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production' or os.environ.get('RAILWAY_ENVIRONMENT'):
     DATABASE_PATH = '/tmp/cricket.db'
     LOG_FILE = '/tmp/app.log'
     BACKUP_PATH = '/tmp/backups'
@@ -17,8 +21,8 @@ else:
     LOG_FILE = os.path.join(PROJECT_ROOT, 'logs', 'app.log')
     BACKUP_PATH = os.path.join(PROJECT_ROOT, 'backups')
 
-# Create directories only in development (not in production)
-if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production'):
+# Create directories only in development (not in server production)
+if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production' or os.environ.get('RAILWAY_ENVIRONMENT')):
     try:
         os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
         os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
@@ -26,7 +30,7 @@ if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production')
     except Exception as e:
         print(f"Warning: Could not create directories: {e}")
 
-# Upload folder paths
+# Upload folder paths (Railway backend fixes)
 UPLOAD_FOLDER = os.path.join(PROJECT_ROOT, 'uploads')
 PLAYER_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'players')
 BACKGROUND_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'backgrounds')
@@ -35,7 +39,14 @@ GENERATED_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'manual_posts'
 AUTO_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'auto_posts')
 WICKET_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'wicket_posts')
 
-# Create upload directories (these should exist in production)
+# Shorthand paths jo tumhaari baki files backend me use karti hain
+PLAYERS_FOLDER = PLAYER_UPLOAD_FOLDER
+BACKGROUNDS_FOLDER = BACKGROUND_UPLOAD_FOLDER
+SPONSORS_FOLDER = SPONSOR_UPLOAD_FOLDER
+PLAYER_IMAGE_SIZE = (400, 400)
+WORKER_CAN_EDIT_CAPTION = True
+
+# Create upload directories automatically
 for folder in [PLAYER_UPLOAD_FOLDER, BACKGROUND_UPLOAD_FOLDER, SPONSOR_UPLOAD_FOLDER, 
                GENERATED_POSTS_FOLDER, AUTO_POSTS_FOLDER, WICKET_POSTS_FOLDER]:
     try:
@@ -57,8 +68,12 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     
-    # JWT settings
+    # ============================================
+    # JWT SETTINGS (यहाँ पर missing variables जोड़ दिए हैं!)
+    # ============================================
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
+    JWT_ALGORITHM = 'HS256'
+    JWT_EXPIRATION_HOURS = 24
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
     
     # Database
@@ -68,6 +83,13 @@ class Config:
     # Upload settings
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    
+    # Shorthand properties for backend imports
+    PLAYERS_FOLDER = PLAYERS_FOLDER
+    BACKGROUNDS_FOLDER = BACKGROUNDS_FOLDER
+    SPONSORS_FOLDER = SPONSORS_FOLDER
+    PLAYER_IMAGE_SIZE = PLAYER_IMAGE_SIZE
+    WORKER_CAN_EDIT_CAPTION = WORKER_CAN_EDIT_CAPTION
     
     # API keys
     CRICAPI_KEY = os.environ.get('CRICAPI_KEY', '')
@@ -90,7 +112,7 @@ class Config:
     
     # Environment
     FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
-    IS_PRODUCTION = FLASK_ENV == 'production' or bool(os.environ.get('VERCEL'))
+    IS_PRODUCTION = FLASK_ENV == 'production' or bool(os.environ.get('VERCEL')) or bool(os.environ.get('RAILWAY_ENVIRONMENT'))
 
 class DevelopmentConfig(Config):
     """Development configuration"""
@@ -111,10 +133,11 @@ class TestingConfig(Config):
 
 # Select config based on environment
 config_name = os.environ.get('FLASK_ENV', 'development')
-if config_name == 'production':
+if config_name == 'production' or os.environ.get('RAILWAY_ENVIRONMENT'):
     config = ProductionConfig()
 elif config_name == 'testing':
     config = TestingConfig()
 else:
     config = DevelopmentConfig()
+    
     
