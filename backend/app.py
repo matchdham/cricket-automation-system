@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 import json
 
 # Import करो सभी modules
-from .config import config
+from .config import config, Config
 from .auth import hash_password, verify_password, generate_jwt_token, verify_jwt_token
 from .database import init_database, get_db_connection, log_error, fetch_one, fetch_all, execute_query
 from .cricket_api import get_current_matches, get_match_info
@@ -32,7 +32,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
 # Runtime par ensure karo ki saare automation aur logo folders exist karte hon (Railway Fix)
-for folder in [config.PLAYERS_FOLDER, config.BACKGROUNDS_FOLDER, config.SPONSORS_FOLDER]:
+for folder in [Config.PLAYERS_FOLDER, Config.BACKGROUNDS_FOLDER, Config.SPONSORS_FOLDER]:
     if not os.path.exists(folder):
         try:
             os.makedirs(folder, exist_ok=True)
@@ -119,8 +119,6 @@ def require_role(required_role):
 def api_login():
     """
     User login करो
-    REQUEST: {"username": "admin", "password": "admin123"}
-    RESPONSE: {"success": true, "token": "...", "user_id": 1, "role": "admin"}
     """
     try:
         data = request.json
@@ -179,24 +177,20 @@ def api_create_post():
         if not news_title:
             return jsonify({'success': False, 'message': 'News title required'}), 400
         
-        # Settings लो
         settings = fetch_one('SELECT * FROM settings WHERE id = 1')
         sponsor_logo = settings['sponsor_logo_path'] if settings else None
         text_bold = settings['text_bold'] if settings else False
         
-        # Background image
         background_image = None
         if use_custom_bg and settings and settings['fixed_background_path']:
             background_image = settings['fixed_background_path']
         
-        # Gemini से auto-caption generate करो
         caption_data = generate_caption_with_hashtags(news_title, ai_prompt)
         caption = caption_data.get('caption', news_title)
         hashtags = caption_data.get('hashtags', '#cricket #live')
         
         final_caption = f"{caption}\n{hashtags}"
         
-        # Image generate करो (यहाँ auto logo apply हो रहा है)
         image_path = create_graphic_with_text(
             news_title=final_caption,
             background_image=background_image,
@@ -208,7 +202,6 @@ def api_create_post():
         if not image_path:
             return jsonify({'success': False, 'message': 'Failed to create graphic'}), 500
         
-        # Database में save करो
         conn = get_db_connection()
         cursor = conn.cursor()
         
@@ -221,7 +214,6 @@ def api_create_post():
         
         post_id = cursor.lastrowid
         
-        # Counter update करो
         cursor.execute('''
             UPDATE lifecycle_counter 
             SET total_images_created = total_images_created + 1,
@@ -229,7 +221,6 @@ def api_create_post():
             WHERE id = 1
         ''')
         
-        # Facebook queue में add करो
         cursor.execute('''
             INSERT INTO facebook_queue (post_id, status)
             VALUES (?, 'pending')
@@ -267,11 +258,9 @@ def api_edit_caption():
         if not post_id or not new_caption:
             return jsonify({'success': False, 'message': 'Post ID and caption required'}), 400
         
-        # Check permissions
-        if request.role == 'worker' and not config.WORKER_CAN_EDIT_CAPTION:
+        if request.role == 'worker' and not Config.WORKER_CAN_EDIT_CAPTION:
             return jsonify({'success': False, 'message': 'Permission denied'}), 403
         
-        # Update करो
         execute_query('''
             UPDATE posts 
             SET caption = ?, hashtags = ?
@@ -287,7 +276,7 @@ def api_edit_caption():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 # ============================================
-# TAB 2: DESIGN CONTROL (यहाँ से लोगो अपलोड होगा)
+# TAB 2: DESIGN CONTROL
 # ============================================
 
 @app.route('/api/upload-background', methods=['POST'])
@@ -306,11 +295,10 @@ def api_upload_background():
         filename = secure_filename(file.filename)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f"bg_{timestamp}_{filename}"
-        filepath = os.path.join(config.BACKGROUNDS_FOLDER, filename)
+        filepath = os.path.join(Config.BACKGROUNDS_FOLDER, filename)
         
         file.save(filepath)
         
-        # Settings update करो
         execute_query('''
             UPDATE settings 
             SET fixed_background_path = ?, use_fixed_background = 1
@@ -342,7 +330,7 @@ def api_upload_sponsor():
         filename = secure_filename(file.filename)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f"sponsor_{timestamp}_{filename}"
-        filepath = os.path.join(config.SPONSORS_FOLDER, filename)
+        filepath = os.path.join(Config.SPONSORS_FOLDER, filename)
         
         file.save(filepath)
         
@@ -386,7 +374,7 @@ def api_toggle_settings():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 # ============================================
-# TAB 3: PLAYER VAULT
+# TAB 3: PLAYER VAULT (Fix किया हुआ Section ⚡)
 # ============================================
 
 @app.route('/api/upload-player', methods=['POST'])
@@ -401,14 +389,14 @@ def api_upload_player():
         
         file = request.files['player_image']
         
-        # Image resize करो (400x400)
+        # Image resize करो Config variable standard mapping ke sath
         from PIL import Image
         img = Image.open(file)
-        img = img.resize((config.PLAYER_IMAGE_SIZE[0], config.PLAYER_IMAGE_SIZE[1]))
+        img = img.resize((Config.PLAYER_IMAGE_SIZE[0], Config.PLAYER_IMAGE_SIZE[1]))
         
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f"{secure_filename(player_name)}_{timestamp}.png"
-        image_path = os.path.join(config.PLAYERS_FOLDER, filename)
+        image_path = os.path.join(Config.PLAYERS_FOLDER, filename)
         
         img.save(image_path, 'PNG')
         
@@ -580,21 +568,19 @@ def api_health_status():
         return jsonify({'success': False, 'status': 'error'}), 500
 
 # ============================================
-# PAGES (Routings Fix)
-# ================================
+# PAGES 
+# ============================================
+
 @app.route('/')
 def index():
-    """Login page load karo"""
     return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
-    """Main dashboard load karo"""
     return render_template('dashboard.html')
 
 @app.route('/boss-panel')
 def boss_panel():
-    """Boss control panel load karo"""
     return render_template('boss_panel.html')
 
 # ============================================
@@ -603,4 +589,3 @@ def boss_panel():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=port)
-
