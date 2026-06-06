@@ -1,6 +1,6 @@
 # ============================================
 # FILE: app.py
-# PURPOSE: Main Flask Server - सभी routes
+# PURPOSE: Main Flask Server - सभी routes (Option B & Key Size Fixed)
 # ============================================
 
 from flask import Flask, render_template, request, jsonify, send_file
@@ -374,7 +374,7 @@ def api_toggle_settings():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 # ============================================
-# TAB 3: PLAYER VAULT (Fix किया हुआ Section ⚡)
+# TAB 3: PLAYER VAULT (FIXED CODE 🔥)
 # ============================================
 
 @app.route('/api/upload-player', methods=['POST'])
@@ -404,10 +404,11 @@ def api_upload_player():
         cursor = conn.cursor()
         
         try:
+            # FIX: Database mein sirf filename save kar rahe hain rasta nahi
             cursor.execute('''
                 INSERT INTO players (name, image_path)
                 VALUES (?, ?)
-            ''', (player_name, image_path))
+            ''', (player_name, filename))
             
             conn.commit()
             conn.close()
@@ -417,7 +418,7 @@ def api_upload_player():
             return jsonify({
                 'success': True,
                 'message': f'{player_name} added',
-                'image_path': image_path
+                'image_path': f'/uploads/players/{filename}'
             })
         
         except sqlite3.IntegrityError:
@@ -435,8 +436,13 @@ def api_get_players():
     try:
         players = fetch_all('SELECT id, name, image_path FROM players')
         
+        # FIX: Frontend ko output mein seedhe static asset URL '/uploads/players/filename' milega
         players_list = [
-            {'id': p['id'], 'name': p['name'], 'image_path': p['image_path']}
+            {
+                'id': p['id'], 
+                'name': p['name'], 
+                'image_path': f'/uploads/players/{p["image_path"]}' if not p["image_path"].startswith('/uploads/') else p["image_path"]
+            }
             for p in players
         ]
         
@@ -456,8 +462,10 @@ def api_delete_player(player_id):
         if not player:
             return jsonify({'success': False, 'message': 'Player not found'}), 404
         
-        if os.path.exists(player['image_path']):
-            os.remove(player['image_path'])
+        # Physical file delete karne ke liye sahi static path link setup
+        full_file_path = os.path.join(Config.PLAYERS_FOLDER, os.path.basename(player['image_path']))
+        if os.path.exists(full_file_path):
+            os.remove(full_file_path)
         
         execute_query('DELETE FROM players WHERE id = ?', (player_id,))
         
@@ -566,7 +574,6 @@ def api_health_status():
     except Exception as e:
         log_error('api_error', 'Health check failed', str(e))
         return jsonify({'success': False, 'status': 'error'}), 500
-
 # ============================================
 # PAGES 
 # ============================================
@@ -584,8 +591,18 @@ def boss_panel():
     return render_template('boss_panel.html')
 
 # ============================================
+# FIX: ROUTE FOR SERVING THE PLAYER IMAGES TO BROWSER
+# ============================================
+@app.route('/uploads/players/<filename>')
+def serve_player_image(filename):
+    from flask import send_from_directory
+    return send_from_directory(Config.PLAYERS_FOLDER, filename)
+
+# ============================================
 # SERVER START
 # ============================================
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=port)
+
+
