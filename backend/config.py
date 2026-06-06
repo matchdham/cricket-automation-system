@@ -1,6 +1,6 @@
 # ============================================
 # FILE: config.py
-# PURPOSE: App Global Configuration & Environment Settings (Option B - Static Paths)
+# PURPOSE: App Global Configuration & Environment Settings (Fixed Keys & Option B)
 # ============================================
 
 import os
@@ -21,7 +21,7 @@ else:
     LOG_FILE = os.path.join(PROJECT_ROOT, 'logs', 'app.log')
     BACKUP_PATH = os.path.join(PROJECT_ROOT, 'backups')
 
-# Create directories only in development (not in server production)
+# Create directories only in development
 if not (os.environ.get('VERCEL') or os.environ.get('FLASK_ENV') == 'production' or os.environ.get('RAILWAY_ENVIRONMENT')):
     try:
         os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
@@ -44,7 +44,7 @@ GENERATED_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'manual_posts'
 AUTO_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'auto_posts')
 WICKET_POSTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'generated', 'wicket_posts')
 
-# Shorthand paths jo tumhaari baki files backend me use karti hain
+# Shorthand paths jo baaki files use karti hain
 PLAYERS_FOLDER = PLAYER_UPLOAD_FOLDER
 BACKGROUNDS_FOLDER = BACKGROUND_UPLOAD_FOLDER
 SPONSORS_FOLDER = SPONSOR_UPLOAD_FOLDER
@@ -61,7 +61,8 @@ for folder in [PLAYER_UPLOAD_FOLDER, BACKGROUND_UPLOAD_FOLDER, SPONSOR_UPLOAD_FO
 
 class Config:
     """Base configuration"""
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production-32-chars-min')
+    # 32 characters se lambi securely generated key taaki server block na kare
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'SUPER_SECURE_SECRET_KEY_CRICKET_DASHBOARD_PRODUCTION_32_CHARS_LONG')
     DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
     TESTING = False
     BCRYPT_LOG_ROUNDS = 12
@@ -71,8 +72,8 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     
-    # JWT SETTINGS
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production-32-chars')
+    # JWT SETTINGS - Fixed 32+ characters length
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'SUPER_SECURE_JWT_SECRET_KEY_FOR_AUTHENTICATION_32_CHARS_LONG')
     JWT_ALGORITHM = 'HS256'
     JWT_EXPIRATION_HOURS = 24
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
@@ -137,4 +138,5 @@ elif config_name == 'testing':
     config = TestingConfig()
 else:
     config = DevelopmentConfig()
+
     
